@@ -1,6 +1,6 @@
 package cn.zenliu.kotlin.jieba
 
-import cn.zenliu.kotlin.jieba.JnrJieba.TokenizerMode.CUT_HMM
+import cn.zenliu.kotlin.jieba.JnrJieba.TokenizerMode.*
 import org.junit.jupiter.api.Test
 
 import org.junit.jupiter.api.Assertions.*
@@ -48,10 +48,16 @@ internal class JnrJiebaTest {
 	@Test
 	fun tokenizer() {
 		JnrJieba.initial("dict.big.gz")
+		JnrJieba.tokenizer(art[18],mode = CUT_ALL)
+				.apply (::println)
 		JnrJieba.tokenizer(art[18],mode = CUT_HMM)
-				.apply {
-					println(this)
-				}
+				.apply (::println)
+		JnrJieba.tokenizer(art[18],mode = CUT_NO_HMM)
+				.apply (::println)
+		JnrJieba.tokenizer(art[18],mode = CUT_SEARCH_HMM)
+				.apply (::println)
+		JnrJieba.tokenizer(art[18],mode = CUT_SEARCH_NO_HMM)
+				.apply (::println)
 	}
 	@Test
 	fun tokenizerBenchmark() {
