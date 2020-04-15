@@ -5,33 +5,56 @@ import jnr.ffi.LibraryLoader
 import jnr.ffi.annotations.Encoding
 import jnr.ffi.annotations.Transient
 import java.io.File
+import java.io.InputStream
+import java.security.MessageDigest
+import javax.xml.bind.DatatypeConverter
 
 object JnrJieba {
 	private const val soName = "jieba.so"
 	private const val dictName = "dict.gz"
 	private const val dictNameBig = "dict.big.gz"
+	private val InputStream.md5sum
+		get() = MessageDigest.getInstance("MD5").let { md5 ->
+			buffered().use {
+				md5.digest(it.readBytes())
+			}.let {
+				DatatypeConverter.printHexBinary(it)
+			}
+		}
 	private val jr = loadLibFromJar()
 	private var initialization = false
 	private fun loadLibFromJar(): Jieba {
-		if (File(soName).exists() && File(dictName).exists()) {
-			return LibraryLoader.create(Jieba::class.java).load(File(soName).absolutePath)
-		}
+		val soo = File(soName)
+		val dico = File(dictName)
+		val dicbo = File(dictNameBig)
+
 		val so = this::class.java.getResourceAsStream("/jnr/$soName")
 		val dict = this::class.java.getResourceAsStream("/jnr/$dictName")
 		val dictBig = this::class.java.getResourceAsStream("/jnr/$dictNameBig")
-		File(soName).apply {
+
+		if (soo.exists() && dico.exists() && dicbo.exists()) {
+			//control by user
+		/*	if (
+					soo.inputStream().md5sum == so.md5sum
+					&& dico.inputStream().md5sum == dict.md5sum
+					&& dicbo.inputStream().md5sum == dictBig.md5sum
+			)*/
+				return LibraryLoader.create(Jieba::class.java).load(File(soName).absolutePath)
+		}
+
+		soo.apply {
 			createNewFile()
 			outputStream().use {
 				so.copyTo(it)
 			}
 		}
-		File(dictName).apply {
+		dico.apply {
 			createNewFile()
 			outputStream().use {
 				dict.copyTo(it)
 			}
 		}
-		File(dictNameBig).apply {
+		dicbo.apply {
 			createNewFile()
 			outputStream().use {
 				dictBig.copyTo(it)
@@ -70,7 +93,7 @@ object JnrJieba {
 	fun tokenizer(src: String, delimiter: String = "|", mode: TokenizerMode = CUT_ALL): List<String> {
 		assert(initialization) { "jieba not be initialized" }
 		assert(delimiter.length in 1..3) { "delimiter must have length of 1-3" }
-		if(src.isBlank()) return emptyList()
+		if (src.isBlank()) return emptyList()
 		return jr.Tokenizer(src, delimiter, mode.ordinal).split(delimiter)
 	}
 
