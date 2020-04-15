@@ -4,3 +4,4 @@ target/
 /dict.big.gz
 /dict.gz
 /jieba.so
+.ref/
