@@ -1,7 +1,7 @@
 package jieba
 
 import (
-
+	"jiebaJnr/jieba/finalseg"
 	"math"
 	"regexp"
 	"strings"
@@ -158,7 +158,7 @@ func (seg *Segmenter) cutDAG(sentence string) <-chan string {
 						result <- bufString
 					} else {
 						if v, ok := seg.dict.Frequency(bufString); !ok || v == 0.0 {
-							for x := range Cut(bufString) {
+							for x := range finalseg.Cut(bufString) {
 								result <- x
 							}
 						} else {
@@ -180,7 +180,7 @@ func (seg *Segmenter) cutDAG(sentence string) <-chan string {
 				result <- bufString
 			} else {
 				if v, ok := seg.dict.Frequency(bufString); !ok || v == 0.0 {
-					for t := range Cut(bufString) {
+					for t := range finalseg.Cut(bufString) {
 						result <- t
 					}
 				} else {

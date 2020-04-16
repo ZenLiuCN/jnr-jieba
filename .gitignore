@@ -5,3 +5,6 @@ target/
 /dict.gz
 /jieba.so
 .ref/
+.gosdk/
+.gopath/
+bin/
